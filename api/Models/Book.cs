@@ -1,9 +1,8 @@
 using System;
-using System.Data.Entity;
 
 namespace Fisher.Bookstore.Models
 {
-    public class Books
+    public class Book
     {
         public int Id {get; set;}
 
@@ -12,8 +11,5 @@ namespace Fisher.Bookstore.Models
         public string Author {get; set;}
 
         public string ISBN {get; set;}
-
-        public DateTime publiccationDate {get; set;}
-
     }
 }

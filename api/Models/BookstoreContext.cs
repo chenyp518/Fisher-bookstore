@@ -4,11 +4,13 @@ namespace Fisher.Bookstore.Models
 {
     public class BookstoreContext : DbContext
     {
-        public BookstoreContext(DdContextOptions<BookstoreContext> options)
+        public BookstoreContext(DbContextOptions<BookstoreContext> options)
             : base(options)
         {
         }
 
-        public DdSet<Book> Books {get; set;}
+        public DbSet<Book> Books {get; set;}
     }
+
+    
 }
