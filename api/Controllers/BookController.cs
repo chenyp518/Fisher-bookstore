@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fisher.Bookstore.Data;
 using Fisher.Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
 
