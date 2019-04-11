@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fisher.Bookstore.Data;
 using Fisher.Bookstore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fisher.Bookstore.Api.Controllers
@@ -43,81 +44,84 @@ namespace Fisher.Bookstore.Api.Controllers
             }
             this.db.SaveChanges();
         }
-    [HttpGet]
-    public IActionResult Get()
-    {
-        return Ok(db.Books);
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(db.Books);
+        }
+
+        [HttpGet("{id}", Name = "GetBook")]
+        public IActionResult GetBook(int id)
+        {
+            // Try to find the correct book
+            var book = this.db.Books.FirstOrDefault(b => b.Id == id);
+
+            // If no book is found with the given ID, return HTTP 404 Not Found
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            // Return the Book inside HTTP 200 OK
+            return Ok(book);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult Post([FromBody] Book book)
+        {
+            if (book == null)
+            {
+                return BadRequest();
+            }
+
+            this.db.Books.Add(book);
+            this.db.SaveChanges();
+
+            return CreatedAtRoute("GetBook", new { Id = book.Id }, book);
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] Book book)
+        {
+            // Validate the incoming book
+            if (book == null || book.Id != id)
+            {
+                return BadRequest();
+            }
+
+            // Verify that the book is in the database
+            var bookToEdit = this.db.Books.FirstOrDefault(b => b.Id == id);
+            if (bookToEdit == null)
+            {
+                return NotFound();
+            }
+
+            bookToEdit.Title = book.Title;
+            bookToEdit.ISBN = book.ISBN;
+
+            this.db.Books.Update(bookToEdit);
+            this.db.SaveChanges();
+
+            return NoContent();
+        }
+        [Authorize]
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var book = this.db.Books.FirstOrDefault(b => b.Id == id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            this.db.Books.Remove(book);
+            this.db.SaveChanges();
+
+            return NoContent();
+        }
     }
 
-    [HttpGet("{id}", Name = "GetBook")]
-    public IActionResult GetBook(int id)
-    {
-        // Try to find the correct book
-        var book = this.db.Books.FirstOrDefault(b => b.Id == id);
 
-        // If no book is found with the given ID, return HTTP 404 Not Found
-        if (book == null)
-        {
-            return NotFound();
-        }
-
-        // Return the Book inside HTTP 200 OK
-        return Ok(book);
-    }
-
-    [HttpPost]
-    public IActionResult Post([FromBody] Book book)
-    {
-        if (book == null)
-        {
-            return BadRequest();
-        }
-
-        this.db.Books.Add(book);
-        this.db.SaveChanges();
-
-        return CreatedAtRoute("GetBook", new { Id = book.Id }, book);
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Book book)
-    {
-        // Validate the incoming book
-        if (book == null || book.Id != id)
-        {
-            return BadRequest();
-        }
-
-        // Verify that the book is in the database
-        var bookToEdit = this.db.Books.FirstOrDefault(b => b.Id == id);
-        if (bookToEdit == null)
-        {
-            return NotFound();
-        }
-
-        bookToEdit.Title = book.Title;
-        bookToEdit.ISBN = book.ISBN;
-
-        this.db.Books.Update(bookToEdit);
-        this.db.SaveChanges();
-
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-    {
-        var book = this.db.Books.FirstOrDefault(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-
-        this.db.Books.Remove(book);
-        this.db.SaveChanges();
-
-        return NoContent();
-    }}
-
-    
 }
