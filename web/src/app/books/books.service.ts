@@ -1,0 +1,26 @@
+import { Injectable } from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
+import {catchError, map, tap } from 'rxjs/operators';
+import {Book} from './book';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CustomersService {
+
+  private customersUri = 'https://localhost:5001/api/books';
+  private handleError<T>(operation = 'operation', result?: T){
+    return (error:any): Observable<T> => {
+      console.error(`${operation} failed : ${error.message}`);
+      return of (result as T);
+    };
+  }
+  constructor(private http: HttpClient){}
+  getCustomers(){
+    return this.http.get<Book[]>(this.customersUri).pipe(
+      tap(_=> console.log('fetched customers')),
+      catchError(this.handleError<Book[]>('getBooks',[]))
+    );
+  }
+}

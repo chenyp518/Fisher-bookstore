@@ -31,6 +31,14 @@ namespace Fisher.Bookstore.Api
              .AddEntityFrameworkStores<BookstoreContext>()
              .AddDefaultTokenProviders();
 
+            services.AddCors(options => {
+                options.AddPolicy("CorsPolicy", builder =>{
+                    builder.WithOrigins("http://localhost:4201")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+            });
+
             services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,6 +76,7 @@ namespace Fisher.Bookstore.Api
             app.UseAuthentication();
 
             app.UseHttpsRedirection();
+            app.UseCors("CorsPolicy");
             app.UseMvc();
         }
     }
